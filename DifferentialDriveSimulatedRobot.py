@@ -61,7 +61,7 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         # Inititalize the robot parameters
         self.wheelBase = 0.5  # distance between the wheels
         self.wheelRadius = 0.1  # radius of the wheels
-        self.pulse_x_wheelTurns = 1024  # number of pulses per wheel turn
+        self.pulse_x_wheelTurns = 4096  # number of pulses per wheel turn
 
         # Initialize the sensor simulation
         self.encoder_reading_frequency = 1  # frequency of encoder readings
@@ -78,8 +78,8 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.xy_feature_reading_frequency = 300 # frequency of XY feature readings
         self.xy_max_range = 50  # maximum XY range, used to simulate the field of view
 
-        self.yaw_reading_frequency = 50  # frequency of Yasw readings
-        self.v_yaw_std = np.deg2rad(5) # std deviation of simulated heading noise
+        self.yaw_reading_frequency = 10 # frequency of Yasw readings
+        self.v_yaw_std = np.deg2rad(2) # std deviation of simulated heading noise
 
         
 
@@ -171,17 +171,10 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         n_L = (v_L * self.dt) / p_L
         n_R = (v_R * self.dt) / p_R
         
-        noise = np.random.multivariate_normal([0,0], self.Re)
-        n_L += noise[0]
-        n_R += noise[1]
-        # print(f"n_L and n_R = {n_L} , {n_R}")
-        # Creating the encoder values vector
         zsk = np.array([n_L , n_R])
 
 
         return zsk, self.Re
-
-        pass
 
     def ReadCompass(self):
         """ Simulates the compass reading of the robot.

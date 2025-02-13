@@ -82,13 +82,14 @@ class GFLocalization(Localization,GaussianFilter):
 
         # PREDICTION STEP
         uk, Qk = self.GetInput()
+        
         xk_bar, Pk_bar = self.Prediction(uk, Qk, xk_1, Pk_1)
 
         # UPDATE STEP
         zk, Rk, Hk, Vk = self.GetMeasurements()
 
         if zk is None or zk.size == 0:
-            print("No measurements available. Skipping update.")
+
             xk = xk_bar
             Pk = Pk_bar
             zk = np.zeros((0,0))
@@ -131,8 +132,7 @@ class GFLocalization(Localization,GaussianFilter):
             Pk_1 = Pk
 
         self.PlotState()  # plot the state estimation         
-        # uk = np.array([[dx],[dy],[dphi]])
-        # uk = uk.reshape(3,1)results
+
         plt.show()
 
     def Log(self, xsk, xk, Pk, xk_bar, zk):

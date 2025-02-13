@@ -60,32 +60,44 @@ class DR_3DOFDifferentialDrive(Localization):
 
         :return: uk:  input vector (:math:`u_k=[n_L~n_R]^T`)
         """
-        
-
+        # Reading the encoders as a measurement that is a gaussian. zsk = [n_L~n_R]^T, Re = diag(σ_L^2,σ_R^2)
+        # zsk is a mean vector and Re is a covariance matrix
         zsk , Re = self.robot.ReadEncoders()
 
-        
+        # Calculating the  mean distance per pulse, and transforming the covariance matrix from pulse to distance
         x_L = (zsk[0]/self.robot.pulse_x_wheelTurns)*2*np.pi*self.wheelRadius
         x_R = (zsk[1]/self.robot.pulse_x_wheelTurns)*2*np.pi*self.wheelRadius
         
+        J_p2x = np.array([[(2*np.pi*self.wheelRadius)/self.robot.pulse_x_wheelTurns,0],
+                          [0,(2*np.pi*self.wheelRadius)/self.robot.pulse_x_wheelTurns]])
+        
+        Rx = J_p2x @ Re @ J_p2x.T
+        
+        # Calculating the mean displacement and angular displacement and transforming the covariance matrix
         disp = 0.5 * (x_L + x_R)
         a_disp = (x_L - x_R) / self.wheelBase
         
         
-        # Show derivation: partial derivative of the input w.r.t. v and w
-        J = np.array([[np.pi * self.wheelRadius/(self.robot.pulse_x_wheelTurns),np.pi * self.wheelRadius/(self.robot.pulse_x_wheelTurns)],
-                      [2*np.pi*self.wheelRadius/(self.robot.pulse_x_wheelTurns*self.wheelBase),-2*np.pi*self.wheelRadius/(self.robot.pulse_x_wheelTurns*self.wheelBase)],])
-        Qk = J @ Re @ J.T
+        A = np.array([[0.5],
+                      [0.5]])
+        B = np.array([[1/self.wheelBase],
+                      [-1/self.wheelBase]])
+        RxL = np.array([[Rx[0][0]]])
+        RxR = np.array([[Rx[1][1]]])
+        Qk = A @ RxL @ A.T + B @ RxR @ B.T
         
+        # Noise sampled from the Gaussian distribution N(0,Qk) After transformation from pulse to distance
+        # traveled per wheel to x,dtheta in the B frame
+        noise_x , noise_dtheta = np.random.multivariate_normal([0,0], Qk)
+        disp += noise_x
+        a_disp += noise_dtheta
+
         
         uk = np.array([[disp],[a_disp]])
 
 
         
         return uk, Qk
-    
-
-        pass
 
 if __name__ == "__main__":
 
@@ -96,7 +108,7 @@ if __name__ == "__main__":
            CartesianFeature(np.array([[-3, 50]]).T),
            CartesianFeature(np.array([[-20, 3]]).T),
            CartesianFeature(np.array([[40,-40]]).T)]  # feature map. Position of 2 point features in the world frame.
-
+    np.random.seed(0)
     xs0=np.zeros((6,1))   # initial simulated robot pose
     robot = DifferentialDriveSimulatedRobot(xs0, M) # instantiate the simulated robot object
 

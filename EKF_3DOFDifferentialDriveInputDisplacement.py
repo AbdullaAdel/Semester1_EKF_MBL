@@ -59,18 +59,17 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
         :return: uk,Qk
         """
         # TODO: To be completed by the student
-        
+        # uk = [v, w], Qk = Covariance. 
+        # The input is in terms of velocity and angular velocity, and its covariance 
         Uk , Re = DR_3DOFDifferentialDrive.GetInput(self)
 
-        dphi = Uk[1,0] 
-        dx = Uk[0,0] 
+        # Changing the input from v,w to dx,dy,dphi which is to ensure that the size of the matrix final is (3,1)
+        
+        dx = Uk[0,0]
         dy = 0
+        dphi = Uk[1,0] 
         
-        # Show derivation: partial derivative of the input w.r.t. v and w
-        # J = np.array([[ float(np.cos(dphi) * self.dt),0],
-        #               [ float(np.sin(dphi) * self.dt),0],
-        #               [0 , float(self.dt)]])
-        
+        # the B frame only moves along the x axis and there is no movement in the y axis
         J_new = np.array([[1,0],
                           [0,0],
                           [0,1]])
@@ -88,14 +87,6 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
 
         :return: zk, Rk, Hk, Vk
         """
-        # Infer state dimension dynamically if not explicitly available
-        state_dim = getattr(self, 'state_dim', 3)  # Default to 3 (e.g., x, y, yaw) if not defined
-
-        # Initialize as empty
-        zk = np.zeros((0, 1))  # Measurement vector
-        Rk = np.zeros((0, 0))  # Measurement noise covariance
-        Hk = np.zeros((0, state_dim))  # Observation Jacobian
-        Vk = np.zeros((0, 0))  # Noise Jacobian
 
         # Read compass measurement
         z_yaw, sigma2_yaw = self.robot.ReadCompass()
@@ -107,11 +98,11 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
             zk = zk.reshape(1, 1)
             Rk = np.diag(sigma2_yaw)
             Hk = np.array([[0, 0, 1]])  # Observation Jacobian for yaw
-            Hk = Hk.reshape(1, state_dim)
+            Hk = Hk.reshape(1, 3)
             Vk = np.eye(1)  # Noise Jacobian for yaw
 
         # Ensure correct default return when no measurements are available
-        if zk.size == 0:
+        if z_yaw is None:
             return None, None, None, None
 
         return zk, Rk, Hk, Vk
@@ -127,6 +118,7 @@ if __name__ == '__main__':
            CartesianFeature(np.array([[-20, 3]]).T),
            CartesianFeature(np.array([[40,-40]]).T)]  # feature map. Position of 2 point features in the world frame.
 
+    np.random.seed(2)
     xs0 = np.zeros((6,1))  # initial simulated robot pose
 
     robot = DifferentialDriveSimulatedRobot(xs0, M)  # instantiate the simulated robot object

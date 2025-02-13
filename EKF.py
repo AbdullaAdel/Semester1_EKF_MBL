@@ -84,10 +84,7 @@ class EKF(GaussianFilter):
         
         Pk_bar = A_k @ Pk_1 @ A_k.T + W_k @ Qk @ W_k.T
         
-        # self.xk_bar = xk_bar
-        # # Pk_bar = 0.5 * (Pk_bar + Pk_bar.T)
-        # self.Pk_bar = Pk_bar
-        
+
         return xk_bar, Pk_bar
     
 
@@ -106,7 +103,7 @@ class EKF(GaussianFilter):
         # logging for plotting
         self.xk_bar = xk_bar
         self.Pk_bar = Pk_bar
-        self.zk = zk;
+        self.zk = zk
         self.nz = zk.shape[0];  # store dimensionality of the observation
         self.Rk = Rk  # store the observation and noise covariance for logging
 
