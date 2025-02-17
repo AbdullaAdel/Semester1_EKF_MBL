@@ -78,7 +78,7 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.xy_feature_reading_frequency = 300 # frequency of XY feature readings
         self.xy_max_range = 50  # maximum XY range, used to simulate the field of view
 
-        self.yaw_reading_frequency = 10 # frequency of Yasw readings
+        self.yaw_reading_frequency = 500 # frequency of Yaw readings
         self.v_yaw_std = np.deg2rad(2) # std deviation of simulated heading noise
 
         

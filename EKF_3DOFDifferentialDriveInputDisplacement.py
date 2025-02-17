@@ -59,11 +59,11 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
         :return: uk,Qk
         """
         # TODO: To be completed by the student
-        # uk = [v, w], Qk = Covariance. 
+        # uk = [dx, dphi], Qk = Covariance. 
         # The input is in terms of velocity and angular velocity, and its covariance 
         Uk , Re = DR_3DOFDifferentialDrive.GetInput(self)
 
-        # Changing the input from v,w to dx,dy,dphi which is to ensure that the size of the matrix final is (3,1)
+        # Changing the input from dx,dphi to dx,dy,dphi which is to ensure that the size of the matrix final is (3,1)
         
         dx = Uk[0,0]
         dy = 0
