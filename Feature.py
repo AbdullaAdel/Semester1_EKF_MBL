@@ -155,10 +155,10 @@ class CartesianFeature(Feature,np.ndarray):
         """
 
         # TODO: To be completed by the student
-        # F = np.array([[1,0,0],
-        #               [0,1,0]])
-        J =  BxF.F @ NxB.J_1oplus((BxF.F).T @ BxF)
+        F = np.array([[1,0,0],
+                      [0,1,0]])
         
+        J = F@Pose3D.J_1oplus(NxB, F.T.dot(BxF))@F.T
         return J
 
     def J_2boxplus(BxF, NxB):
@@ -178,8 +178,7 @@ class CartesianFeature(Feature,np.ndarray):
         
         F = np.array([[1,0,0],
                       [0,1,0]])
-        
-        J = F@NxB.J_2oplus()@F.T
+        J = F@Pose3D.J_2oplus(NxB)@F.T
         
         return J
 
@@ -211,13 +210,13 @@ if __name__ == '__main__':
     print("J_1boxplus=", BxF.J_1boxplus(NxB3dof))
     print("J_2boxplus=", BxF.J_2boxplus(NxB3dof))
 
-    NxB4dof=Pose4D(np.array([[5,5,5,np.pi/2]]).T)
+    # NxB4dof=Pose4D(np.array([[5,5,5,np.pi/2]]).T)
 
-    NxF = BxF.boxplus(NxB4dof)
+    # NxF = BxF.boxplus(NxB4dof)
 
-    print("NxF=", NxF.T)
-    print("J_1boxplus=", BxF.J_1boxplus(NxB4dof))
-    print("J_2boxplus=", BxF.J_2boxplus(NxB4dof))
+    # print("NxF=", NxF.T)
+    # print("J_1boxplus=", BxF.J_1boxplus(NxB4dof))
+    # print("J_2boxplus=", BxF.J_2boxplus(NxB4dof))
 
     exit(0)
 
