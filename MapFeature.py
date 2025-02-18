@@ -12,7 +12,7 @@ class MapFeature:
 
     When mapped, a feature may involve 2 different representations:
 
-    * **The observation representation:** which is the representation used by the sensors to observe the feature.
+    * **The observation representation:** which is the representation used by the sensors to observe the CartesianFeature.
     * **The storage representation:** which is the representation used to store the feature in the map within the state vector.
 
     For instance, a feature may be observed in polar coordinates but stored in Cartesian coordinates. In this case, the
@@ -93,7 +93,7 @@ class MapFeature:
         J = np.diag(np.ones(np.shape(v)[0]))
         return J
 
-    def hf(self, xk):  # Observation function for al zf observations
+    def hf(self, xk):  # Observation function for all zf observations
         """
         This is the direct observation model, implementing the feature observation equation for the data
         association hypothesis :math:`\mathcal{H}`, the features observation vector :math:`z_f, the state vector :math:`x_k`,
@@ -125,21 +125,15 @@ class MapFeature:
         :return: vector of expected features observations corresponding to the vector of observed features :math:`z_f`.
         """
         # TODO: To be implemented by the student
-        # h = []
-        # M = self.M
+        h = []
+        M = self.M
         
-        # for i in range(len(M)):
-        #     h.append( self.s2o( self.hfj(xk, M[i])) )
-        # zf = np.array(h)
-        # return zf
-        if len(map_i) > 0:   
-            _hf = self.hfj(xk, map_i[0])
-        else:
-            return np.zeros((0,1))
+        for i in range(len(M)):
+            h.append( self.s2o( self.hfj(xk, M[i])) )
+        zf = np.array(h)
+        return zf
+        
 
-        for i in range(1,len(map_i)):
-            _hf = np.block([[_hf],[self.hfj(xk, map_i[i])]])
-        return _hf
 
     def Jhfx(self, xk):  # Jacobian wrt x of the feature observation function for all zf observations
         """
@@ -217,9 +211,9 @@ class MapFeature:
 
         # TODO: To be implemented by the student
         xk_bar = Pose3D(xk_bar)
-        xkbar = xk_bar.ominus()
-        _hfj = self.s2o(xkbar.boxplus(self.M[Fj]))
-        return _hfj
+        xk_bar_omin = xk_bar.ominus()
+        hfj = CartesianFeature.boxplus( self.M[Fj],xk_bar_omin)
+        return hfj
 
     def Jhfjx(self, xk, Fj):  # Jacobian wrt x of the observation function for feature observation i
         """
@@ -246,9 +240,11 @@ class MapFeature:
         NxB = Pose3D(xk[0:xBpose_dim,0].reshape((xBpose_dim,1)))
         F = np.block([np.diag(np.ones(xBpose_dim)), np.zeros((xBpose_dim, xB_dim-xBpose_dim))])
         
-        A = self.J_s2o(self.M[Fj].boxplus(Pose3D.ominus(NxB))) #2x2
+        # A = self.J_s2o(self.M[Fj].boxplus(Pose3D.ominus(NxB))) #2x2
+        
+        A = self.J_s2o(CartesianFeature.boxplus(self.M[Fj], Pose3D.ominus(NxB)))
         B = CartesianFeature.J_1boxplus(self.M[Fj], Pose3D.ominus(NxB)) #2x2 -> should be 2x3
-        C = Pose3D.J_ominus(NxB) @ F #3x3
+        C = Pose3D.J_ominus(NxB)  #3x3
         J = A @ B @ C
         return J
 
@@ -275,7 +271,7 @@ class MapFeature:
         xBpose = 3
         NxB = Pose3D(xk[0:xBpose,0].reshape((xBpose,1)))
 
-        NxFj = (self.o2s(BxFj)).boxplus(NxB)
+        NxFj = CartesianFeature.boxplus(self.o2s(BxFj),NxB)
         return NxFj
 
 
@@ -302,8 +298,9 @@ class MapFeature:
 
         xF_dim = np.shape(BxFj)[0]
         NxB = Pose3D(xk[0:xBpose_dim,0].reshape((xBpose_dim,1)))
-        J=self.o2s(BxFj).J_1boxplus(NxB)
-        return J
+        J_1 = CartesianFeature.J_1boxplus(BxFj,Pose3D.ominus(NxB))
+        
+        return J_1
 
     def Jgv(self, xk, BxFj):
         """
@@ -321,8 +318,10 @@ class MapFeature:
         # TODO: To be implemented by the student
         xBpose_dim = 3
         NxB = Pose3D(xk[0:xBpose_dim,0].reshape((xBpose_dim,1)))
-        J = NxB.J_2boxplus(self.o2s(BxFj)) @ self.J_o2s(BxFj)
-        return J
+        J = CartesianFeature.J_2boxplus(BxFj, Pose3D.ominus(NxB)) 
+        J_1 = J @ self.J_o2s(BxFj)
+        # J = NxB.J_2boxplus(self.o2s(BxFj)) @ self.J_o2s(BxFj)
+        return J_1
 
 
 class Cartesian2DMapFeature(MapFeature):

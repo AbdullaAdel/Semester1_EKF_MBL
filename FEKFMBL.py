@@ -226,9 +226,17 @@ class FEKFMBL(GFLocalization, MapFeature):
         [zk, Rk, Hk, Vk, znp, Rnp] = self.StackMeasurementsAndFeatures(xk_bar, zm, Rm, Hm, Vm, zf, Rf, Hp)
         print(f'Hp (Features observed: {Hp})')
         # return xk, Pk, xk_bar, zk, Rk
-        xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
-        self.Pk = Pk
-        self.xk = xk
+        
+        ###### TESTING ######
+        ###### DR ONLY ######
+        xk, Pk = xk_bar, Pk_bar
+        self.Pk = Pk_bar
+        self.xk = xk_bar 
+        #####################
+        
+        # xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
+        # self.Pk = Pk
+        # self.xk = xk
         
         self.Log(self.robot.xsk, xk, Pk, xk_bar, zk)    
         self.PlotUncertainty(zf_plot, r_plot)

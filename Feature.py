@@ -72,7 +72,7 @@ class Feature:
         """
         pass
 
-    def J_2c(selfself):
+    def J_2c(self):
         """
         Jacobian of the ToCartesian method. Required for plotting non Cartesian features.
         **To be overriden by the child class**.
@@ -158,7 +158,7 @@ class CartesianFeature(Feature,np.ndarray):
         F = np.array([[1,0,0],
                       [0,1,0]])
         
-        J = F@Pose3D.J_1oplus(NxB, F.T.dot(BxF))@F.T
+        J = F@Pose3D.J_1oplus(NxB, F.T.dot(BxF))
         return J
 
     def J_2boxplus(BxF, NxB):
@@ -178,7 +178,7 @@ class CartesianFeature(Feature,np.ndarray):
         
         F = np.array([[1,0,0],
                       [0,1,0]])
-        J = F@Pose3D.J_2oplus(NxB)@F.T
+        J = F@Pose3D.J_2oplus(NxB) @ F.T
         
         return J
 
