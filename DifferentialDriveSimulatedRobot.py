@@ -75,10 +75,10 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.Cartesian2D_max_range = 50  # maximum Cartesian2D range, used to simulate the field of view
         self.Rfc = np.diag(np.array([0.5 ** 2, 1.0 ** 2]))  # covariance of simulated Cartesian2D feature noise
 
-        self.xy_feature_reading_frequency = 1 # frequency of XY feature readings
+        self.xy_feature_reading_frequency =100000 # frequency of XY feature readings
         self.xy_max_range = 50  # maximum XY range, used to simulate the field of view
 
-        self.yaw_reading_frequency = 500 # frequency of Yaw readings
+        self.yaw_reading_frequency = 10 # frequency of Yaw readings
         self.v_yaw_std = np.deg2rad(1) # std deviation of simulated heading noise
 
         
@@ -166,8 +166,7 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         v_L = self.xsk[3][0] + 0.5*self.xsk[5][0]*self.wheelBase
         v_R = 2*self.xsk[3][0] - v_L
         
-
-        # print(f"v_L and v_R in encoder = {v_L} , {v_R}")
+        # Calculating the number of pulses
         n_L = (v_L * self.dt) / p_L
         n_R = (v_R * self.dt) / p_R
         
@@ -212,8 +211,10 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
             noise = np.random.normal(0, np.sqrt(self.Rfc.diagonal())).reshape((len(self.Rfc),1))
             zsk.append(self.M[i].boxplus(xsk.ominus()) + noise )
             Rsk.append(self.Rfc)
-
-        print(len(zsk))
+            print(f'zsk for feature {i} is {zsk[i]}')
+            
+        
+ 
 
         if self.Cartesian2D_feature_reading_frequency != 0 and self.k % self.Cartesian2D_feature_reading_frequency == 0:
             return zsk, Rsk

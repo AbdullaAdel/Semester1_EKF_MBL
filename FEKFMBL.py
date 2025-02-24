@@ -1,3 +1,4 @@
+
 import scipy
 from GFLocalization import *
 from MapFeature import *
@@ -224,19 +225,22 @@ class FEKFMBL(GFLocalization, MapFeature):
         Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
         
         [zk, Rk, Hk, Vk, znp, Rnp] = self.StackMeasurementsAndFeatures(xk_bar, zm, Rm, Hm, Vm, zf, Rf, Hp)
+        
+        
         print(f'Hp (Features observed: {Hp})')
+        print(f'zp = \n\n{zf}')
         # return xk, Pk, xk_bar, zk, Rk
         
         ###### TESTING ######
         ###### DR ONLY ######
-        xk, Pk = xk_bar, Pk_bar
-        self.Pk = Pk_bar
-        self.xk = xk_bar 
+        # xk, Pk = xk_bar, Pk_bar
+        # self.Pk = Pk_bar
+        # self.xk = xk_bar 
         #####################
         
-        # xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
-        # self.Pk = Pk
-        # self.xk = xk
+        xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
+        self.Pk = Pk
+        self.xk = xk
         
         self.Log(self.robot.xsk, xk, Pk, xk_bar, zk)    
         self.PlotUncertainty(zf_plot, r_plot)
@@ -278,11 +282,7 @@ class FEKFMBL(GFLocalization, MapFeature):
 
             Hk = np.block([[Hm], [Hp]])
 
-            Vk = scipy.linalg.block_diag(Vm, Vp)
-
-        print(zk.size)
-        print(zp.size)
-        
+            Vk = scipy.linalg.block_diag(Vm, Vp)        
 
         return zk, Rk, Hk, Vk, znp, Rnp
 

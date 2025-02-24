@@ -1,5 +1,5 @@
 from MapFeature import *
-from FEKFMBL import *
+from FEKFMBL2 import *
 from EKF_3DOFDifferentialDriveInputDisplacement import *
 from conversions import *
 
@@ -13,15 +13,15 @@ class MBL_3DOFDDInputDisplacementMM_2DCartesianFeatureOM(Cartesian2DMapFeature, 
     """
 
     def __init__(self, *args):
-    #     xBpose_dim = xB_dim = 3
-    #     xF_dim = 2
-    #     zfi_dim = 2
+        xBpose_dim = xB_dim = 3
+        xF_dim = 2
+        zfi_dim = 2
         self.Feature = globals()["CartesianFeature"]
         self.Pose = globals()["Pose3D"]
         super().__init__( *args)
 
 if __name__ == '__main__':
-
+ 
     M = [CartesianFeature(np.array([[-40, 5]]).T),
            CartesianFeature(np.array([[-5, 40]]).T),
            CartesianFeature(np.array([[-5, 25]]).T),
