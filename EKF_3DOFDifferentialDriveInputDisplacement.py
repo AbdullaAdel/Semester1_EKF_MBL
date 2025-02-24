@@ -96,7 +96,7 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
             # Add compass measurement to observation vector
             zk = np.array([[z_yaw]])
             zk = zk.reshape(1, 1)
-            Rk = np.diag(sigma2_yaw)
+            Rk = np.diag(np.array(sigma2_yaw).flatten()).reshape(1, 1)
             Hk = np.array([[0, 0, 1]])  # Observation Jacobian for yaw
             Hk = Hk.reshape(1, 3)
             Vk = np.eye(1)  # Noise Jacobian for yaw

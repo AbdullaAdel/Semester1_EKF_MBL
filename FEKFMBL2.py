@@ -253,20 +253,19 @@ class FEKFMBL(GFLocalization, MapFeature):
         """
 
         # TODO: To be completed by the student
-        zp , Rp, Hp, Vp, znp, Rnp = self.SplitFeatures(zf, Rf, H)
-        if zm is None:
-            zk , Rk, Hk, Vk = zp, Rp, Hp, Vp
-        elif zp is None:
-            zk , Rk, Hk, Vk = zm, Rm, Hm, Vm
+        zp, Rp, Hp, Vp, znp, Rnp = self.SplitFeatures(zf, Rf, H)
+        # If one of the observation sets is empty, use the other one.
+        if zm is None or (hasattr(zm, "size") and zm.size == 0):
+            zk, Rk, Hk, Vk = zp, Rp, Hp, Vp
+        elif zp is None or (hasattr(zp, "size") and zp.size == 0):
+            zk, Rk, Hk, Vk = zm, Rm, Hm, Vm
         else:
-            zk = np.block([[zm], [zp]])
+            # Both are non-empty, stack them vertically.
+            zk = np.vstack((zm, zp))
             Rk = scipy.linalg.block_diag(Rm, Rp)
-
-            Hk = np.block([[Hm], [Hp]])
-
-            Vk = scipy.linalg.block_diag(Vm, Vp)     
+            Hk = np.vstack((Hm, Hp))
+            Vk = scipy.linalg.block_diag(Vm, Vp)
         return zk, Rk, Hk, Vk, znp, Rnp
-
     def SplitFeatures(self, zf, Rf, H):
         """
         Given the vector of feature observations :math:`z_f` and their covariance matrix :math:`R_f`, and the vector of

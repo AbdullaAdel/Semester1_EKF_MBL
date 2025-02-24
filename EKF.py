@@ -114,12 +114,23 @@ class EKF(GaussianFilter):
         if zk.shape[0] == 0 :
             
             return xk_bar, Pk_bar
-        
-        K_k = Pk_bar @ Hk.T @ np.linalg.pinv(Hk @ Pk_bar @ Hk.T + Vk @ Rk @ Vk.T).reshape(self.nz, self.nz)
+        # Compute the innovation covariance
+        S = Hk @ Pk_bar @ Hk.T + Vk @ Rk @ Vk.T
+        # Compute the Kalman gain without reshaping:
+        K_k = Pk_bar @ Hk.T @ np.linalg.pinv(S)
 
+        # Update the state:
         xk = xk_bar + K_k @ (zk - Hk @ xk_bar)
-        # xk = xk.reshape(3, 1)
-        Pk = (np.eye(Hk.shape[1]) - K_k @ Hk) @ Pk_bar @ (np.eye(Hk.shape[1]) - K_k @ Hk).T
+
+        # Update the covariance using the Joseph form:
+        I = np.eye(Pk_bar.shape[0])
+        Pk = (I - K_k @ Hk) @ Pk_bar @ (I - K_k @ Hk).T + K_k @ Rk @ K_k.T
+        # K_k = Pk_bar @ Hk.T @ np.linalg.pinv(Hk @ Pk_bar @ Hk.T + Vk @ Rk @ Vk.T)
+
+
+        # xk = xk_bar + K_k @ (zk - Hk @ xk_bar)
+        # # xk = xk.reshape(3, 1)
+        # Pk = (np.eye(Hk.shape[1]) - K_k @ Hk) @ Pk_bar @ (np.eye(Hk.shape[1]) - K_k @ Hk).T
         # Pk = Pk.reshape(3, 3)
         self.Pk = Pk
         self.xk = xk
