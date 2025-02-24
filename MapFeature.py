@@ -236,16 +236,22 @@ class MapFeature:
         # J_hfjx = J_s2o @ J_1[+] * J_(-)
         # TODO: To be implemented by the student
         xB_dim = np.shape(xk)[0]
+        xB_dim = np.shape(xk)[0]
         xBpose_dim = 3
-        NxB = Pose3D(xk[0:xBpose_dim,0].reshape((xBpose_dim,1)))
-        F = np.block([np.diag(np.ones(xBpose_dim)), np.zeros((xBpose_dim, xB_dim-xBpose_dim))])
+        NxB = Pose3D(xk[0:xBpose_dim, 0].reshape((xBpose_dim, 1)))
+        # F: extracts the pose part from the state vector (if state > 3 DOF)
+        F = np.block([np.diag(np.ones(xBpose_dim)), np.zeros((xBpose_dim, xB_dim - xBpose_dim))])
         
-        # A = self.J_s2o(self.M[Fj].boxplus(Pose3D.ominus(NxB))) #2x2
-        
+        # A: derivative of s2o(·); by default an identity 2×2
         A = self.J_s2o(CartesianFeature.boxplus(self.M[Fj], Pose3D.ominus(NxB)))
-        B = CartesianFeature.J_1boxplus(self.M[Fj], Pose3D.ominus(NxB)) #2x2 -> should be 2x3
-        C = Pose3D.J_ominus(NxB)  #3x3
-        J = A @ B @ C
+        # B: derivative of the boxplus operator with respect to the robot pose.
+        # It should yield a 2×3 matrix. (Make sure Pose3D.J_1oplus returns a 3×3 matrix.)
+        B = CartesianFeature.J_1boxplus(self.M[Fj], Pose3D.ominus(NxB))
+        # C: derivative of the inverse operator on the robot pose, expected to be 3×3.
+        C = Pose3D.J_ominus(NxB)
+        
+        # Multiply the chain and then extract the pose portion.
+        J = A @ B @ C 
         return J
 
     def g(self, xk, BxFj):  # xBp [+] (BxFj + vk)
