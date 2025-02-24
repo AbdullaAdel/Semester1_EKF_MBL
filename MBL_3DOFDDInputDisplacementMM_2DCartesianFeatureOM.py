@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
 
     xs0 = np.zeros((6, 1))
-    kSteps = 2002
+    kSteps = 4000
     alpha = 0.95
 
     index = [IndexStruct("x", 0, None), IndexStruct("y", 1, None), IndexStruct("yaw", 2, 1)]

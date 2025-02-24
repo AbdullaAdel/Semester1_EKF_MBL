@@ -155,15 +155,11 @@ class CartesianFeature(Feature,np.ndarray):
         """
 
         # TODO: To be completed by the student
+        
         F = np.array([[1, 0, 0],
                     [0, 1, 0]])
-        # If BxF is a 2x1 vector, lift it to 3x1 by appending a zero.
-        if BxF.shape[0] == 2:
-            BxF_lifted = np.vstack((BxF, [[0]]))
-        else:
-            BxF_lifted = BxF
-        # Compute the Jacobian of the pose-compounding operation.
-        J = F @ Pose3D.J_1oplus(NxB, BxF_lifted)
+
+        J = F@ NxB.J_1oplus(F.T.dot(BxF))
         return J
 
     def J_2boxplus(BxF, NxB):

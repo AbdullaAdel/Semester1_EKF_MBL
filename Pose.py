@@ -257,7 +257,7 @@ class Pose3D(Pose):
 
         :returns: A-Frame pose expressed in B-Frame coordinates (eq. :eq:`eq-ominus3dof`)
         """
-        BxA = np.array([[(-AxB[0,0] * np.cos(AxB[2,0])) - AxB[1,0] * np.sin(AxB[2,0])],
+        BxA = np.array([[-(AxB[0,0] * np.cos(AxB[2,0])) - AxB[1,0] * np.sin(AxB[2,0])],
                         [(AxB[0,0] * np.sin(AxB[2,0])) - AxB[1,0] * np.cos(AxB[2,0])],
                         [-AxB[2,0]]])
         return Pose3D(BxA)
@@ -283,6 +283,6 @@ class Pose3D(Pose):
         """
         J3 = np.array([[-np.cos(AxB[2][0]) , -np.sin(AxB[2][0]), AxB[0][0]*np.sin(AxB[2][0]) - AxB[1][0]*np.cos(AxB[2][0])],
                        [np.sin(AxB[2][0]) , -np.cos(AxB[2][0]) , AxB[0][0]*np.cos(AxB[2][0]) + AxB[1][0]*np.sin(AxB[2][0])],
-                       [0 , 0 , 1]])
+                       [0 , 0 , -1]])
 
         return J3

@@ -321,10 +321,9 @@ class MapFeature:
         # TODO: To be implemented by the student
         xBpose_dim = 3
         NxB = Pose3D(xk[0:xBpose_dim,0].reshape((xBpose_dim,1)))
-        J = CartesianFeature.J_2boxplus(BxFj, Pose3D.ominus(NxB)) 
-        J_1 = J @ self.J_o2s(BxFj)
-        # J = NxB.J_2boxplus(self.o2s(BxFj)) @ self.J_o2s(BxFj)
-        return J_1
+
+        J = CartesianFeature.J_2boxplus(BxFj,NxB)
+        return J
 
 
 class Cartesian2DMapFeature(MapFeature):

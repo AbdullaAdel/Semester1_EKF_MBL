@@ -111,8 +111,8 @@ class EKF(GaussianFilter):
         # KF equations begin here
 
         # TODO: To be implemented by the student
-        if self.k < 2000:
-            return xk_bar, Pk_bar
+        # if self.k < 2000:
+        #     return xk_bar, Pk_bar
         if zk.shape[0] == 0 :
             print("Before Here")
             return xk_bar, Pk_bar
