@@ -69,7 +69,7 @@ class SimulatedRobot:
         self.yTraj = [xs0[1, 0]]
         self.trajectory = plt.plot(self.xTraj, self.yTraj, 'b')
 
-        self.visualizationInterval = 20 # number of time steps between two visualization updates
+        self.visualizationInterval = 1 # number of time steps between two visualization updates
 
         self.vehicleIcon.plot([xs0[0], xs0[1], xs0[3]])
         self.plt_samples = []

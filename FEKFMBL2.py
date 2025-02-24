@@ -45,8 +45,8 @@ class FEKFMBL(GFLocalization, MapFeature):
         self.plt_zf_line = []
         self.plt_samples = []
         
-        self.xk = []
-        self.Pk = []
+        # self.xk = []
+        # self.Pk = []
 
     def h(self, xk):  # overloaded to stack measurements and feature observations
         """
@@ -87,10 +87,10 @@ class FEKFMBL(GFLocalization, MapFeature):
         # TODO: To be completed by the student
         # Returns the compass measurements of the robot (internal measurements)
         # TODO2: Check if there is a need to get the errors as well
-        _hm = EKF.hm(self,xk)
-        # _hm = super().h(xk)
-        # _hm = EKF_3DOFDifferentialDriveInputDisplacement.hm(self,xk)
         
+        _hm = super().h(xk)
+        # _hm = EKF_3DOFDifferentialDriveInputDisplacement.hm(self,xk)
+
         return _hm
 
     def SquaredMahalanobisDistance(self, hfj, Pfj, zfi, Rfi):
@@ -173,7 +173,8 @@ class FEKFMBL(GFLocalization, MapFeature):
         :param Rf: Covariance matrix of the feature observations
         :return: The vector of asociation hypothesis H
         """
-
+        self.xk = xk
+        self.Pk = Pk
         # TODO: To be completed by the student
         hfi = []
         Pf = []
@@ -195,38 +196,34 @@ class FEKFMBL(GFLocalization, MapFeature):
         """
         zf_plot=np.zeros([0,1])
         r_plot=np.zeros([0,0])
+        
         # TODO: To be completed by the student
         uk, Qk = self.GetInput()
         xk_bar, Pk_bar  = self.Prediction(uk, Qk, xk_1, Pk_1)
         
         zm, Rm , Hm, Vm  = self.GetMeasurements()
         zf, Rf  = self.GetFeatures()
-        
-     
-        
-        for i in range(len(zf)):
-            zf_plot=np.block([[zf_plot],[zf[i]]])
-            r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
-        
-        Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
-        
-        zk , Rk , Hk, Vk, znp, Rnp = self.StackMeasurementsAndFeatures(zm, Rm, Hm, Vm, zf, Rf, Hp)
-        
-        zk = np.array(zk).reshape(len(zk), 1)
-        
-        #    ##### TESTING ######
-        # ##### DR ONLY ######
-        # xk, Pk = xk_bar, Pk_bar
-        # self.Pk = Pk_bar
-        # self.xk = xk_bar 
-        # ####################
-        
-        
-        xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
-        self.Pk = Pk
+
+        if len(zf) != 0:
+            for i in range(len(zf)):
+                zf_plot=np.block([[zf_plot],[zf[i]]])
+                r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
+            
+            Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
+            Hp = [1]
+            
+            zk , Rk , Hk, Vk, znp, Rnp = self.StackMeasurementsAndFeatures(zm, Rm, Hm, Vm, zf, Rf, Hp)
+            zk = np.array(zk).reshape(len(zk), 1)
+            xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
+        else:
+            xk = xk_bar
+            Pk = Pk_bar
+
+
         self.xk = xk
+        self.Pk = Pk
         
-        self.Log(self.robot.xsk, xk, Pk, xk_bar, zk)    
+        self.Log(self.robot.xsk, xk, Pk, xk_bar, None)    
         self.PlotUncertainty(zf_plot, r_plot)
         
         return xk, Pk
@@ -292,7 +289,7 @@ class FEKFMBL(GFLocalization, MapFeature):
                 # For associated features, stack the measurement as a column vector
                 zp_list.append(zf[i].reshape(-1, 1))
                 Rp_list.append(Rf[i])
-                Hp_list.append(self.Jhfjx(self.robot.xsk, j-1))
+                Hp_list.append(self.Jhfjx(self.xk, j-1)) ## TODO--> ??
                 Vp_list.append(np.eye(self.zfi_dim))
             else:
                 # For non-associated features, stack the measurement similarly

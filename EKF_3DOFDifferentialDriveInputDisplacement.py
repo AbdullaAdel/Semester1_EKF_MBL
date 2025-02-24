@@ -49,8 +49,11 @@ class EKF_3DOFDifferentialDriveInputDisplacement(GFLocalization, DR_3DOFDifferen
         return J
 
     def h(self, xk):  #:hm(self, xk):
+        if self.k % self.robot.yaw_reading_frequency == 0 and self.k != 0:
         # TODO: To be completed by the student
-        h = xk[2]
+            h = np.array(xk[2]).reshape(len(xk[2]), 1)
+        else:   
+            h = np.array([]).reshape(0,1)
         return h  # return the expected observations
 
     def GetInput(self):

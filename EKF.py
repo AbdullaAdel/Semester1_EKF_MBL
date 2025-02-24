@@ -111,22 +111,30 @@ class EKF(GaussianFilter):
         # KF equations begin here
 
         # TODO: To be implemented by the student
-        if zk.shape[0] == 0 :
-            
+        if self.k < 2000:
             return xk_bar, Pk_bar
+        if zk.shape[0] == 0 :
+            print("Before Here")
+            return xk_bar, Pk_bar
+        
+        if zk.shape[0] == 2:
+            print("here")
         # Compute the innovation covariance
         S = Hk @ Pk_bar @ Hk.T + Vk @ Rk @ Vk.T
         # Compute the Kalman gain without reshaping:
         K_k = Pk_bar @ Hk.T @ np.linalg.pinv(S)
 
         # Update the state:
-        xk = xk_bar + K_k @ (zk - Hk @ xk_bar)
+        # xk = xk_bar + K_k @ (zk - Hk @ xk_bar)
+        xk = xk_bar + K_k @ (zk - self.h(xk_bar))
+        print(zk - self.h(xk_bar))
 
         # Update the covariance using the Joseph form:
         I = np.eye(Pk_bar.shape[0])
-        Pk = (I - K_k @ Hk) @ Pk_bar @ (I - K_k @ Hk).T + K_k @ Rk @ K_k.T
+        Pk = (I - K_k @ Hk) @ Pk_bar @ (I - K_k @ Hk).T 
         # K_k = Pk_bar @ Hk.T @ np.linalg.pinv(Hk @ Pk_bar @ Hk.T + Vk @ Rk @ Vk.T)
-
+        print(f'Iteration number{self.k}')
+        
 
         # xk = xk_bar + K_k @ (zk - Hk @ xk_bar)
         # # xk = xk.reshape(3, 1)

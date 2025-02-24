@@ -71,14 +71,14 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.Polar2D_max_range = 50  # maximum Polar2D range, used to simulate the field of view
         self.Rfp = np.diag(np.array([1 ** 2, np.deg2rad(5) ** 2]))  # covariance of simulated Polar2D feature noise
 
-        self.Cartesian2D_feature_reading_frequency = 100000 # frequency of Cartesian2D feature readings
-        self.Cartesian2D_max_range = 50  # maximum Cartesian2D range, used to simulate the field of view
-        self.Rfc = np.diag(np.array([0.5 ** 2, 1.0 ** 2]))  # covariance of simulated Cartesian2D feature noise
+        self.Cartesian2D_feature_reading_frequency = 1 # frequency of Cartesian2D feature readings
+        self.Cartesian2D_max_range = 1000000  # maximum Cartesian2D range, used to simulate the field of view
+        self.Rfc = np.diag(np.array([0.01 ** 2, 0.01 ** 2]))  # covariance of simulated Cartesian2D feature noise
 
         self.xy_feature_reading_frequency =1 # frequency of XY feature readings
         self.xy_max_range = 50  # maximum XY range, used to simulate the field of view
 
-        self.yaw_reading_frequency = 100 # frequency of Yaw readings
+        self.yaw_reading_frequency = 100000 # frequency of Yaw readings
         self.v_yaw_std = np.deg2rad(1) # std deviation of simulated heading noise
 
         
@@ -208,15 +208,22 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         Rsk = []
         xsk=Pose3D(self.xsk[0:3,0].reshape((3,1)))
         for i in range(0,self.nf):
-            noise = np.random.normal(0, np.sqrt(self.Rfc.diagonal())).reshape((len(self.Rfc),1))
-            zsk.append(self.M[i].boxplus(xsk.ominus()) + noise )
-            Rsk.append(self.Rfc)
-            print(f'zsk for feature {i} is {zsk[i]}')
+            noise = np.random.multivariate_normal(np.array([0,0]), self.Rfc).reshape(2,1)
+            z = self.M[i].boxplus(xsk.ominus()) + noise 
+            if np.linalg.norm(z) <= self.Cartesian2D_max_range:
+                zsk.append(z)
+                Rsk.append(self.Rfc)
+                
+                
+            # else:
+            #     zsk.append(np.array([]).reshape(0,1))
+            #     Rsk.append(np.zeros((2,2)))
+            # print(f'zsk for feature {i} is {zsk[i]}')
             
         
  
 
-        if self.Cartesian2D_feature_reading_frequency != 0 and self.k % self.Cartesian2D_feature_reading_frequency == 0:
+        if self.k != 0 and self.k % self.Cartesian2D_feature_reading_frequency == 0:
             return zsk, Rsk
         else:
             return [], []
