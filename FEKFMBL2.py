@@ -210,10 +210,10 @@ class FEKFMBL(GFLocalization, MapFeature):
                 r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
             
             Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
-            Hp = [1]
             
             zk , Rk , Hk, Vk, znp, Rnp = self.StackMeasurementsAndFeatures(zm, Rm, Hm, Vm, zf, Rf, Hp)
             zk = np.array(zk).reshape(len(zk), 1)
+            
             xk, Pk = self.Update(zk, Rk, xk_bar, Pk_bar, Hk, Vk)
         else:
             xk = xk_bar

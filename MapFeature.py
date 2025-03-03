@@ -127,7 +127,7 @@ class MapFeature:
         # TODO: To be implemented by the student
         h = np.array([]).reshape(0,1)
         M = self.M
-        
+        #? add Hp here
         for i in range(len(M)):
             h = np.vstack((h, self.s2o( self.hfj(xk, i))) )
 
@@ -242,9 +242,16 @@ class MapFeature:
         NxB = Pose3D(xk[0:xBpose_dim, 0].reshape((xBpose_dim, 1)))
         NxF = self.M[Fj]
         # A: derivative of s2o(·); by default an identity 2×2
-        A = self.J_s2o(NxB.ominus().boxplus(NxF))
-        B = NxB.ominus().J_1boxplus(NxF) 
-        C = NxB.J_ominus()
+        # A = self.J_s2o(NxB.ominus().boxplus(NxF))
+        # B = NxB.ominus().J_1boxplus(NxF) 
+        # C = NxB.J_ominus()
+        A = self.J_s2o(CartesianFeature.boxplus(self.M[Fj], Pose3D.ominus(NxB)))
+        # B: derivative of the boxplus operator with respect to the robot pose.
+        # It should yield a 2×3 matrix. (Make sure Pose3D.J_1oplus returns a 3×3 matrix.)
+        B = CartesianFeature.J_1boxplus(self.M[Fj], Pose3D.ominus(NxB))
+        # C: derivative of the inverse operator on the robot pose, expected to be 3×3.
+        C = Pose3D.J_ominus(NxB)
+        
 
         J = A @ B @ C 
         

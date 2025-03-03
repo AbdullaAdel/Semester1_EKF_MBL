@@ -71,7 +71,7 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.Polar2D_max_range = 50  # maximum Polar2D range, used to simulate the field of view
         self.Rfp = np.diag(np.array([1 ** 2, np.deg2rad(5) ** 2]))  # covariance of simulated Polar2D feature noise
 
-        self.Cartesian2D_feature_reading_frequency = 10 # frequency of Cartesian2D feature readings
+        self.Cartesian2D_feature_reading_frequency = 10000000000 # frequency of Cartesian2D feature readings
         self.Cartesian2D_max_range = 1000000  # maximum Cartesian2D range, used to simulate the field of view
         self.Rfc = np.diag(np.array([0.01 ** 2, 0.01 ** 2]))  # covariance of simulated Cartesian2D feature noise
 
@@ -212,7 +212,8 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
             z = self.M[i].boxplus(xsk.ominus()) + noise 
             if np.linalg.norm(z) <= self.Cartesian2D_max_range:
                 zsk.append(z)
-                Rsk.append(self.Rfc)
+                #! Being pessimistic about the sampling of the sensor
+                Rsk.append(self.Rfc * 10)
                 
                 
             # else:
