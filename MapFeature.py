@@ -127,9 +127,13 @@ class MapFeature:
         # TODO: To be implemented by the student
         h = np.array([]).reshape(0,1)
         M = self.M
+        Hp = self.Hp
         #? add Hp here
         for i in range(len(M)):
-            h = np.vstack((h, self.s2o( self.hfj(xk, i))) )
+            if Hp[i] == 0:
+                continue
+            else:
+                h = np.vstack((h, self.s2o( self.hfj(xk, i))) )
 
         return h
         

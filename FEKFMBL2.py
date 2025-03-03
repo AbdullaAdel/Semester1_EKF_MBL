@@ -35,6 +35,7 @@ class FEKFMBL(GFLocalization, MapFeature):
 
         self.M = M  # Feature Based Map
         self.nf = len(M)  # number of features
+        self.Hp = [] #! Added by the student
         self.alpha = alpha  # Chi2 tail probability - Confidence interval 95%
         self.plt_zf_ellipse = []  # used for plotting the robot ellipse
         self.plt_zf_line = []  # used for plotting the line towards the robot ellipse
@@ -210,7 +211,7 @@ class FEKFMBL(GFLocalization, MapFeature):
                 r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
             
             Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
-            
+            self.Hp = Hp
             zk , Rk , Hk, Vk, znp, Rnp = self.StackMeasurementsAndFeatures(zm, Rm, Hm, Vm, zf, Rf, Hp)
             zk = np.array(zk).reshape(len(zk), 1)
             
