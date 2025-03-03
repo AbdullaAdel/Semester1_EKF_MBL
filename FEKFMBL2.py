@@ -205,13 +205,19 @@ class FEKFMBL(GFLocalization, MapFeature):
         zm, Rm , Hm, Vm  = self.GetMeasurements()
         zf, Rf  = self.GetFeatures()
 
-        if len(zf) != 0:
-            for i in range(len(zf)):
-                zf_plot=np.block([[zf_plot],[zf[i]]])
-                r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
-            
-            Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
-            self.Hp = Hp
+        if len(zf) != 0 or  zm is not None:
+            if len(zf) != 0:
+                for i in range(len(zf)):
+                    zf_plot=np.block([[zf_plot],[zf[i]]])
+                    r_plot=scipy.linalg.block_diag(r_plot,Rf[i])
+                
+                Hp = self.DataAssociation(xk_bar, Pk_bar, zf, Rf)
+                self.Hp = Hp
+            else:
+                self.Hp = np.zeros(len(self.M))
+                Hp = self.Hp
+                zf = np.array([])
+                Rf = np.array([])
             zk , Rk , Hk, Vk, znp, Rnp = self.StackMeasurementsAndFeatures(zm, Rm, Hm, Vm, zf, Rf, Hp)
             zk = np.array(zk).reshape(len(zk), 1)
             
@@ -281,9 +287,10 @@ class FEKFMBL(GFLocalization, MapFeature):
         zp_list, Rp_list, Hp_list, Vp_list = [], [], [], []
         znp_list, Rnp_list = [], []
 
+        if len(zf) == 0:
+            return np.array([]), np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
         # Ensure zf is a 2D array of shape (n_features, 2)
-        zf = np.array(zf).reshape(len(zf), 2)
-        
+        zf = np.array(zf).reshape(len(zf), 2)    
         for i in range(len(H)):
             j = H[i]
             if j != 0:

@@ -71,14 +71,14 @@ class DifferentialDriveSimulatedRobot(SimulatedRobot):
         self.Polar2D_max_range = 50  # maximum Polar2D range, used to simulate the field of view
         self.Rfp = np.diag(np.array([1 ** 2, np.deg2rad(5) ** 2]))  # covariance of simulated Polar2D feature noise
 
-        self.Cartesian2D_feature_reading_frequency = 100 # frequency of Cartesian2D feature readings
+        self.Cartesian2D_feature_reading_frequency = 1000 # frequency of Cartesian2D feature readings
         self.Cartesian2D_max_range = 1000000  # maximum Cartesian2D range, used to simulate the field of view
         self.Rfc = np.diag(np.array([0.01 ** 2, 0.01 ** 2]))  # covariance of simulated Cartesian2D feature noise
 
         self.xy_feature_reading_frequency =1 # frequency of XY feature readings
         self.xy_max_range = 50  # maximum XY range, used to simulate the field of view
 
-        self.yaw_reading_frequency = 10 # frequency of Yaw readings
+        self.yaw_reading_frequency = 100 # frequency of Yaw readings
         self.v_yaw_std = np.deg2rad(1) # std deviation of simulated heading noise
 
         
